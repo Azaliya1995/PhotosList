@@ -1,14 +1,18 @@
 import React from 'react';
 import {Image, StyleSheet} from 'react-native';
+import {connect} from 'react-redux';
 
 
-export default function ImageView({route}) {
-    const {url} = route.params;
+function ImageView(props) {
     return (
-        <Image source={{uri: url}}
+        <Image source={{uri: props.url}}
                style={styles.fullImg}/>
     );
 }
+
+const mapStateToProps = state => ({
+    url: state.photosList.selectedImageUrl
+});
 
 
 const styles = StyleSheet.create({
@@ -17,3 +21,6 @@ const styles = StyleSheet.create({
         height: '100%',
     },
 });
+
+
+export default connect (mapStateToProps, null) (ImageView);

@@ -1,12 +1,15 @@
 import React from 'react';
 import {Image, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {setImageViewUrl} from '../actions/getImages';
+import {connect} from 'react-redux';
 
 
 const ListItem = (props) => {
     const {item} = props;
     let openImage = function () {
-        props.navigation.navigate('ImageView', {url: item.urls.full});
+        props.setImageUrl(item.urls.full);
+        props.navigation.navigate('ImageView');
     };
     return (
         item ?
@@ -23,6 +26,10 @@ const ListItem = (props) => {
             </TouchableOpacity> : <Text/>
     );
 };
+
+const mapDispatchToProps = dispatch => ({
+    setImageUrl: (url) => dispatch(setImageViewUrl(url)),
+});
 
 const styles = StyleSheet.create({
     sectionContainer: {
@@ -45,4 +52,4 @@ const styles = StyleSheet.create({
     imageDescription: {},
 });
 
-export default ListItem;
+export default connect (null, mapDispatchToProps) (ListItem);

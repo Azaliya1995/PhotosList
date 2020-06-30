@@ -3,11 +3,11 @@ import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import ListItem from './ListItem';
 import React, {useEffect, useState, useCallback} from 'react';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {getImages} from '../actions/getImages';
+import {connect} from 'react-redux';
 
-const PhotosList = ({navigation}) => {
-    let [state, setState] = useState([]);
-    let [loadMore, setLoadMore] = useState(false);
-    let [nextUrl, setNextUrl] = useState('http://api.unsplash.com/photos/?client_id=cf49c08b444ff4cb9e4d126b7e9f7513ba1ee58de7906e4360afc1a33d1bf4c0');
+const PhotosList = (props) => {
+    let { navigation } = props;
 
     const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
         const paddingToBottom = 20;
@@ -15,49 +15,47 @@ const PhotosList = ({navigation}) => {
             contentSize.height - paddingToBottom;
     };
 
-    const fetchData = useCallback(async () => {
-        if (loadMore) {
-            return;
-        }
-
-        setLoadMore(true);
-        const result = await axios.get(nextUrl);
-        setState([...state, ...result.data]);
-        let urls = result.headers.link.split(',');
-        setNextUrl(urls[urls.length - 1].split(';')[0].slice(2, -1));
-        setLoadMore(false);
-    });
-
     useEffect(() => {
-        fetchData();
+        props.getImages(props.url);
+        console.log(props)
     }, []);
 
     return (
-            <View>
-                {state &&
-                <ScrollView
-                    contentInsetAdjustmentBehavior="automatic"
-                    style={styles.scrollView}
-                    scrollEventThrottle={16}
-                    onScroll={(event) => {
-                        if (isCloseToBottom(event.nativeEvent)) {
-                            fetchData();
-                        }
+        <View>
+            {props.images &&
+            <ScrollView
+                contentInsetAdjustmentBehavior="automatic"
+                style={styles.scrollView}
+                scrollEventThrottle={16}
+                onScroll={(event) => {
+                    if (isCloseToBottom(event.nativeEvent) && !props.isLoading) {
+                        props.getImages(props.url);
                     }
-                    }>
-                    <View style={styles.body}>
-                        <View style={styles.sectionContainer}>
-                            <Text style={styles.sectionTitle}>See Your Pictures</Text>
-                        </View>
-                        {state.map((anObjectMapped, index) => {
-                            return <ListItem key={`listPhotos${index}`} item={anObjectMapped} navigation={navigation}/>;
-                        })}
-                    </View>
-                </ScrollView>
                 }
-            </View>
+                }>
+                <View style={styles.body}>
+                    <View style={styles.sectionContainer}>
+                        <Text style={styles.sectionTitle}>See Your Pictures</Text>
+                    </View>
+                    {props.images.map((anObjectMapped, index) => {
+                        return <ListItem key={`listPhotos${index}`} item={anObjectMapped} navigation={navigation}/>;
+                    })}
+                </View>
+            </ScrollView>
+            }
+        </View>
     );
 };
+
+const mapStateToProps = state => ({
+    images: state.photosList.images,
+    isLoading: state.photosList.isLoading,
+    url: state.photosList.url
+});
+
+const mapDispatchToProps = dispatch => ({
+    getImages: (url) => dispatch(getImages(url)),
+});
 
 const styles = StyleSheet.create({
     scrollView: {
@@ -88,4 +86,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default PhotosList;
+export default connect(mapStateToProps, mapDispatchToProps)(PhotosList);

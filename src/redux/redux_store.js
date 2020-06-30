@@ -1,11 +1,11 @@
 import imagesReducer from '../reducers/imagesReducer'
-
-import { createStore, combineReducers } from 'redux';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk'
 
 const rootReducer = combineReducers(
-    {images: imagesReducer}
+    {photosList: imagesReducer}
 );
 const configureStore = () => {
-    return createStore(rootReducer);
+    return createStore(rootReducer, applyMiddleware(thunk));
 }
 export default configureStore;
