@@ -4,15 +4,15 @@ import {getNextUrl} from '../helpers/headers_parser';
 const initialState = {
     images: [],
     isLoading: false,
-    url: "http://api.unsplash.com/photos/?client_id=cf49c08b444ff4cb9e4d126b7e9f7513ba1ee58de7906e4360afc1a33d1bf4c0",
-    selectedImageUrl: ""
+    url: 'http://api.unsplash.com/photos/?client_id=cf49c08b444ff4cb9e4d126b7e9f7513ba1ee58de7906e4360afc1a33d1bf4c0',
+    selectedImageUrl: '',
 };
 
 const imagesReducer = (state = initialState, action) => {
     switch (action.type) {
         case GET_IMAGES_SUCCESS:
             const {data, headers} = action.payload;
-            return { ...state, images: [...state.images, ...data], isLoading: false, url: getNextUrl(headers.link)};
+            return {...state, images: [...state.images, ...data], isLoading: false, url: getNextUrl(headers.link)};
         case GET_IMAGES_FAILURE:
             return {...state, isLoading: false};
         case GET_IMAGES_STARTED:

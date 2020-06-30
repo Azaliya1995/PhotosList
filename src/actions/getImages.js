@@ -9,13 +9,13 @@ export const getImages = (url) => {
         axios.get(url)
             .then(res => {
                 dispatch(getImagesSuccess(res));
-                console.log(res)
+                console.log(res);
             })
             .catch(err => {
                 dispatch(getImagesFailure(err));
-                console.log(err)
-            })
-    }
+                console.log(err);
+            });
+    };
 };
 
 const getImagesSuccess = images => ({

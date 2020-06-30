@@ -11,7 +11,7 @@ function ImageView(props) {
 }
 
 const mapStateToProps = state => ({
-    url: state.photosList.selectedImageUrl
+    url: state.photosList.selectedImageUrl,
 });
 
 
@@ -23,4 +23,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default connect (mapStateToProps, null) (ImageView);
+export default connect(mapStateToProps, null)(ImageView);

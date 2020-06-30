@@ -1,14 +1,14 @@
-import axios from 'axios';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View, Button} from 'react-native';
 import ListItem from './ListItem';
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect} from 'react';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {getImages} from '../actions/getImages';
 import {connect} from 'react-redux';
+import {FAB} from 'react-native-paper';
 
 const PhotosList = (props) => {
-    let { navigation } = props;
-
+    let {navigation} = props;
+    let scroll = null;
     const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
         const paddingToBottom = 20;
         return layoutMeasurement.height + contentOffset.y >=
@@ -17,31 +17,43 @@ const PhotosList = (props) => {
 
     useEffect(() => {
         props.getImages(props.url);
-        console.log(props)
     }, []);
+
+    let goToTop = () => {
+        scroll.scrollTo({x: 0, y: 0, animated: true});
+    };
 
     return (
         <View>
             {props.images &&
-            <ScrollView
-                contentInsetAdjustmentBehavior="automatic"
-                style={styles.scrollView}
-                scrollEventThrottle={16}
-                onScroll={(event) => {
-                    if (isCloseToBottom(event.nativeEvent) && !props.isLoading) {
-                        props.getImages(props.url);
+            <>
+                <ScrollView
+                    contentInsetAdjustmentBehavior="automatic"
+                    style={styles.scrollView}
+                    scrollEventThrottle={16}
+                    ref={(c) => {
+                        scroll = c;
+                    }}
+                    onScroll={(event) => {
+                        if (isCloseToBottom(event.nativeEvent) && !props.isLoading) {
+                            props.getImages(props.url);
+                        }
                     }
-                }
-                }>
-                <View style={styles.body}>
-                    <View style={styles.sectionContainer}>
-                        <Text style={styles.sectionTitle}>See Your Pictures</Text>
+                    }>
+                    <View style={styles.body}>
+                        <View style={styles.sectionContainer}>
+                            <Text style={styles.sectionTitle}>See Your Pictures</Text>
+                        </View>
+                        {props.images.map((anObjectMapped, index) => {
+                            return <ListItem key={`listPhotos${index}`} item={anObjectMapped} navigation={navigation}/>;
+                        })}
                     </View>
-                    {props.images.map((anObjectMapped, index) => {
-                        return <ListItem key={`listPhotos${index}`} item={anObjectMapped} navigation={navigation}/>;
-                    })}
-                </View>
-            </ScrollView>
+                </ScrollView>
+                <FAB
+                    style={styles.fab}
+                    medium
+                    onPress={goToTop}/>
+            </>
             }
         </View>
     );
@@ -50,7 +62,7 @@ const PhotosList = (props) => {
 const mapStateToProps = state => ({
     images: state.photosList.images,
     isLoading: state.photosList.isLoading,
-    url: state.photosList.url
+    url: state.photosList.url,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -80,9 +92,12 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
     },
-    imageInfo: {},
-    imageTitle: {},
-    imageCreator: {},
+    fab: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 0,
+    },
 });
 
 
